@@ -91,7 +91,7 @@
 // some of the older compilers we have to support.
 // -------------------------------------------------------------------------
 
-#ifndef GUTIL_GSCOPED_PTR_H_
+#ifdef GUTIL_GSCOPED_PTR_H_
 #define GUTIL_GSCOPED_PTR_H_
 
 // This is an implementation designed to match the anticipated future TR2
@@ -103,6 +103,7 @@
 #include <stdlib.h>
 
 #include <algorithm>  // For std::swap().
+#include <utility>
 
 #include "gutil/basictypes.h"
 #include "gutil/template_util.h"

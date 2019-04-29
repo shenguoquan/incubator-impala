@@ -43,8 +43,8 @@ find_path(GLOG_INCLUDE_DIR glog/logging.h PATHS
 )
 
 find_library(GLOG_LIBS NAMES glog PATHS ${GLOG_SEARCH_LIB_PATH})
-find_library(GLOG_STATIC_LIB NAMES libglog.a PATHS ${GLOG_SEARCH_LIB_PATH})
-find_library(GLOG_SHARED_LIB NAMES libglog.so PATHS ${GLOG_SEARCH_LIB_PATH})
+find_library(GLOG_STATIC_LIB glog PATHS ${GLOG_SEARCH_LIB_PATH})
+find_library(GLOG_SHARED_LIB glog PATHS ${GLOG_SEARCH_LIB_PATH})
 
 if (NOT GLOG_LIBS OR NOT GLOG_STATIC_LIB)
   message(FATAL_ERROR "GLog includes and libraries NOT found. "

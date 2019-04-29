@@ -539,26 +539,26 @@ under the License.
       </executions>
       </plugin>
 
-      <plugin>
-        <groupId>net.sourceforge.czt.dev</groupId>
-        <artifactId>cup-maven-plugin</artifactId>
-        <version>1.6-cdh</version>
-        <executions>
-          <execution>
-            <id>cup</id>
-            <phase>generate-sources</phase>
-            <goals>
-              <goal>generate</goal>
-            </goals>
-          </execution>
-        </executions>
-        <configuration>
-          <cupDefinition>sql-parser.cup</cupDefinition>
-          <className>SqlParser</className>
-          <symbolsName>SqlParserSymbols</symbolsName>
-          <outputDirectory>${project.build.directory}/generated-sources/cup</outputDirectory>
-        </configuration>
-      </plugin>
+<!--      <plugin>-->
+<!--        <groupId>net.sourceforge.czt.dev</groupId>-->
+<!--        <artifactId>cup-maven-plugin</artifactId>-->
+<!--        <version>1.6-cdh</version>-->
+<!--        <executions>-->
+<!--          <execution>-->
+<!--            <id>cup</id>-->
+<!--            <phase>generate-sources</phase>-->
+<!--            <goals>-->
+<!--              <goal>generate</goal>-->
+<!--            </goals>-->
+<!--          </execution>-->
+<!--        </executions>-->
+<!--        <configuration>-->
+<!--          <cupDefinition>sql-parser.cup</cupDefinition>-->
+<!--          <className>SqlParser</className>-->
+<!--          <symbolsName>SqlParserSymbols</symbolsName>-->
+<!--          <outputDirectory>${project.build.directory}/generated-sources/cup</outputDirectory>-->
+<!--        </configuration>-->
+<!--      </plugin>-->
 
       <plugin>
         <groupId>de.jflex</groupId>

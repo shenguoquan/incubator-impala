@@ -36,6 +36,19 @@ set(IMPALA_BUILD_SHARED_LIBS ${BUILD_SHARED_LIBS})
 # Build compile commands database
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
+# Setting additional C FLAGS
+if(${CMAKE_BUILD_TYPE} MATCHES "DEBUG|Debug|debug")
+  set(ADD_C_FLAGS_DEBUG -Wall -Wpointer-arith -Wendif-labels -Wmissing-format-attribute -Wformat-security -g -fno-strict-aliasing -fwrapv -Wno-unused-command-line-argument -O0 -fPIC)
+  set(ADD_CXX_FLAGS_DEBUG -Wall -Wpointer-arith -Wendif-labels -Wmissing-format-attribute -Wformat-security -g -fno-strict-aliasing -fwrapv -O0 -fPIC)
+elseif(${CMAKE_BUILD_TYPE} MATCHES "RELEASE|Release|release")
+  set(ADD_C_FLAGS_RELEASE -fno-strict-aliasing -fwrapv -O3 -fPIC -DNDEBUG)
+  set(ADD_CXX_FLAGS_RELEASE -fno-strict-aliasing -fwrapv -O3 -fPIC -DNDEBUG)
+endif()
+
+# Setting CXX standard
+set(CMAKE_CXX_STANDARD 11)
+set(CMAKE_CXX_EXTENSIONS OFF)
+
 # generate CTest input files
 enable_testing()
 
@@ -130,10 +143,24 @@ set(Boost_USE_MULTITHREADED OFF)
 # The casing and underscoring expected for these properties varies between
 # versions of CMake. Multiple inconsistent versions may be present here
 # intentionally to provide what a wide range of versions expects.
-set(Boost_NO_SYSTEM_PATHS true)
-set(BOOST_LIBRARYDIR ${BOOST_ROOT}/lib)
-set(BOOST_INCLUDEDIR ${BOOST_ROOT}/include)
-set(Boost_INCLUDE_DIR ${BOOST_INCLUDEDIR})
+set(BOOST_ROOT /usr/local/Cellar/boost/1.68.0_1)
+set(BZIP2_ROOT /usr/local/Cellar/bzip2/1.0.6_1)
+set(ZLIB_ROOT /usr/local/Cellar/zlib/1.2.11)
+set(GLOG_ROOT /usr/local/Cellar/glog/0.3.5_3)
+set(GFLAGS_ROOT /usr/local/Cellar/gflags/2.2.2)
+set(THRIFT_HOME /usr/local/opt/thrift)
+set(THRIFT_ROOT /usr/local/opt/thrift)
+set(FLATBUFFERS_ROOT /usr/local/Cellar/flatbuffers/1.10.0)
+set(SNAPPY_ROOT /usr/local/Cellar/snappy/1.1.7_1)
+set(LZ4_ROOT /usr/local/Cellar/lz4/1.8.3)
+set(RE2_ROOT /usr/local/Cellar/re2/20170501)
+set(AVRO_ROOT /usr/local/Cellar/avro-c/1.8.2_1)
+set(ORC_ROOT /usr/local/Cellar/orc/0.4.28)
+
+#set(Boost_NO_SYSTEM_PATHS true)
+#set(BOOST_LIBRARYDIR ${BOOST_ROOT}/lib)
+#set(BOOST_INCLUDEDIR ${BOOST_ROOT}/include)
+#set(Boost_INCLUDE_DIR ${BOOST_INCLUDEDIR})
 
 if (CMAKE_DEBUG)
   set(Boost_DEBUG TRUE)
@@ -162,7 +189,7 @@ function(IMPALA_ADD_THIRDPARTY_LIB NAME HEADER STATIC_LIB SHARED_LIB)
 endfunction()
 
 
-find_package(Boost REQUIRED COMPONENTS thread regex filesystem system date_time)
+find_package(Boost REQUIRED)
 # Mark Boost as a system header to avoid compile warnings.
 include_directories(SYSTEM ${Boost_INCLUDE_DIRS})
 message(STATUS "Boost include dir: " ${Boost_INCLUDE_DIRS})
@@ -212,31 +239,22 @@ IMPALA_ADD_THIRDPARTY_LIB(gflags ${GFLAGS_INCLUDE_DIR} ${GFLAGS_STATIC_LIB}
   ${GFLAGS_SHARED_LIB})
 
 # find PProf libs
-find_package(PProf REQUIRED)
-IMPALA_ADD_THIRDPARTY_LIB(pprof ${PPROF_INCLUDE_DIR} ${PPROF_STATIC_LIB} "")
+# find_package(PProf REQUIRED)
+# IMPALA_ADD_THIRDPARTY_LIB(pprof ${PPROF_INCLUDE_DIR} ${PPROF_STATIC_LIB} "")
 
 # find GTest headers and libs
 set (GTEST_FIND_QUIETLY TRUE)
-find_package(GTest REQUIRED)
-IMPALA_ADD_THIRDPARTY_LIB(gtest ${GTEST_INCLUDE_DIR} ${GTEST_STATIC_LIB} "")
+# find_package(GTest REQUIRED)
+# IMPALA_ADD_THIRDPARTY_LIB(gtest ${GTEST_INCLUDE_DIR} ${GTEST_STATIC_LIB} "")
 
 # Use LLVM release binaries.
+set(LLVM_ROOT /usr/local/Cellar/llvm/7.0.0)
 set(LLVM_BINARIES_ROOT ${LLVM_ROOT})
-find_package(LlvmBinaries REQUIRED)
+#find_package(LlvmBinaries REQUIRED)
 
-# Find LLVM libraries to link against.
-if ("${CMAKE_BUILD_TYPE}" STREQUAL "DEBUG"
-    OR "${CMAKE_BUILD_TYPE}" STREQUAL "ADDRESS_SANITIZER"
-    OR "${CMAKE_BUILD_TYPE}" STREQUAL "TIDY"
-    OR "${CMAKE_BUILD_TYPE}" STREQUAL "UBSAN"
-    OR "${CMAKE_BUILD_TYPE}" STREQUAL "UBSAN_FULL"
-    OR "${CMAKE_BUILD_TYPE}" STREQUAL "TSAN")
-  # Use the LLVM libaries with assertions for debug builds.
-  set(LLVM_ROOT ${LLVM_DEBUG_ROOT})
-endif()
 message(STATUS "LLVM_ROOT: " ${LLVM_ROOT})
 
-find_package(Llvm REQUIRED)
+find_package(LLVMPkg REQUIRED)
 include_directories(${LLVM_INCLUDE_DIR})
 
 # find Sasl
@@ -245,9 +263,9 @@ find_package(Sasl REQUIRED)
 IMPALA_ADD_THIRDPARTY_LIB(cyrus_sasl ${SASL_INCLUDE_DIR} "" ${SASL_SHARED_LIB})
 
 # find openldap
-find_package(Ldap REQUIRED)
-IMPALA_ADD_THIRDPARTY_LIB(ldap ${LDAP_INCLUDE_DIR} ${LDAP_STATIC_LIBRARY} "")
-IMPALA_ADD_THIRDPARTY_LIB(lber "" ${LBER_STATIC_LIBRARY} "")
+#find_package(Ldap REQUIRED)
+#IMPALA_ADD_THIRDPARTY_LIB(ldap ${LDAP_INCLUDE_DIR} ${LDAP_STATIC_LIBRARY} "")
+#IMPALA_ADD_THIRDPARTY_LIB(lber "" ${LBER_STATIC_LIBRARY} "")
 
 # The environment variable $THRIFT_HOME is set in impala-config.sh
 # Make sure it's consistent with $THRIFT_ROOT.
@@ -291,52 +309,50 @@ find_package(Avro REQUIRED)
 IMPALA_ADD_THIRDPARTY_LIB(avro ${AVRO_INCLUDE_DIR} ${AVRO_STATIC_LIB} "")
 
 # find ORC headers and libs
-find_package(Orc REQUIRED)
-IMPALA_ADD_THIRDPARTY_LIB(orc ${ORC_INCLUDE_DIR} ${ORC_STATIC_LIB} "")
+# find_package(Orc REQUIRED)
+# IMPALA_ADD_THIRDPARTY_LIB(orc ${ORC_INCLUDE_DIR} ${ORC_STATIC_LIB} "")
 
 # find CCTZ headers and libs
-find_package(Cctz REQUIRED)
-IMPALA_ADD_THIRDPARTY_LIB(cctz ${CCTZ_INCLUDE_DIR} ${CCTZ_STATIC_LIB} "")
-
+# find_package(Cctz REQUIRED)
 # find protobuf headers, libs and compiler
-find_package(Protobuf REQUIRED)
-IMPALA_ADD_THIRDPARTY_LIB(protobuf ${PROTOBUF_INCLUDE_DIR} ${PROTOBUF_STATIC_LIBRARY}
-  ${PROTOBUF_SHARED_LIBRARY})
-IMPALA_ADD_THIRDPARTY_LIB(protoc ${PROTOBUF_INCLUDE_DIR} ${PROTOBUF_PROTOC_STATIC_LIBRARY}
-  ${PROTOBUF_PROTOC_SHARED_LIBRARY})
+# find_package(Protobuf REQUIRED)
+#IMPALA_ADD_THIRDPARTY_LIB(protobuf ${PROTOBUF_INCLUDE_DIR} ${PROTOBUF_STATIC_LIBRARY}
+#  ${PROTOBUF_SHARED_LIBRARY})
+# IMPALA_ADD_THIRDPARTY_LIB(protoc ${PROTOBUF_INCLUDE_DIR} ${PROTOBUF_PROTOC_STATIC_LIBRARY}
+#  ${PROTOBUF_PROTOC_SHARED_LIBRARY})
 
 # find libev headers and libs
-find_package(LibEv REQUIRED)
-IMPALA_ADD_THIRDPARTY_LIB(libev ${LIBEV_INCLUDE_DIR} ${LIBEV_STATIC_LIB}
-  ${LIBEV_SHARED_LIB})
+#find_package(LibEv REQUIRED)
+#IMPALA_ADD_THIRDPARTY_LIB(libev ${LIBEV_INCLUDE_DIR} ${LIBEV_STATIC_LIB}
+#  ${LIBEV_SHARED_LIB})
 
 # Find crcutil headers and libs
-find_package(Crcutil REQUIRED)
-IMPALA_ADD_THIRDPARTY_LIB(crcutil ${CRCUTIL_INCLUDE_DIR} ${CRCUTIL_STATIC_LIB}
-  ${CRCUTIL_SHARED_LIB})
+#find_package(Crcutil REQUIRED)
+#IMPALA_ADD_THIRDPARTY_LIB(crcutil ${CRCUTIL_INCLUDE_DIR} ${CRCUTIL_STATIC_LIB}
+#  ${CRCUTIL_SHARED_LIB})
 
 # find jni headers and libs
-find_package(JNI REQUIRED)
-IMPALA_ADD_THIRDPARTY_LIB(java_jvm "${JNI_INCLUDE_DIRS}" ${JAVA_JVM_LIBRARY} "")
+#find_package(JNI REQUIRED)
+#IMPALA_ADD_THIRDPARTY_LIB(java_jvm "${JNI_INCLUDE_DIRS}" ${JAVA_JVM_LIBRARY} "")
 
 # find breakpad headers and libs
-find_package(Breakpad REQUIRED)
-IMPALA_ADD_THIRDPARTY_LIB(breakpad_client ${BREAKPAD_INCLUDE_DIR} ${BREAKPAD_STATIC_LIB}
-  "")
-
-# Be careful with Kerberos: we do not statically link against it as it is a security
-# dependency.
-find_package(Kerberos REQUIRED)
-IMPALA_ADD_THIRDPARTY_LIB(krb5 ${KERBEROS_INCLUDE_DIR} "" ${KERBEROS_LIBRARY})
-
-# We require certain binaries from the kerberos project for our automated kerberos
-# testing.
-find_package(KerberosPrograms REQUIRED)
-
-# Tests that run any security related tests need to link this in to override the
-# krb5_realm_override() implementation in krb5.
-# See be/src/kudu/security/krb5_realm_override.cc for more information.
-set(KRB5_REALM_OVERRIDE -Wl,--undefined=krb5_realm_override_loaded krb5_realm_override)
+#find_package(Breakpad REQUIRED)
+#IMPALA_ADD_THIRDPARTY_LIB(breakpad_client ${BREAKPAD_INCLUDE_DIR} ${BREAKPAD_STATIC_LIB}
+#  "")
+#
+## Be careful with Kerberos: we do not statically link against it as it is a security
+## dependency.
+#find_package(Kerberos REQUIRED)
+#IMPALA_ADD_THIRDPARTY_LIB(krb5 ${KERBEROS_INCLUDE_DIR} "" ${KERBEROS_LIBRARY})
+#
+## We require certain binaries from the kerberos project for our automated kerberos
+## testing.
+#find_package(KerberosPrograms REQUIRED)
+#
+## Tests that run any security related tests need to link this in to override the
+## krb5_realm_override() implementation in krb5.
+## See be/src/kudu/security/krb5_realm_override.cc for more information.
+#set(KRB5_REALM_OVERRIDE -Wl,--undefined=krb5_realm_override_loaded krb5_realm_override)
 
 ###################################################################
 
@@ -383,8 +399,8 @@ else()
 endif()
 # When KUDU_IS_SUPPORTED is false, the Kudu client is expected to be a non-functional
 # stub. It's still needed to link though.
-find_package(kuduClient REQUIRED NO_DEFAULT_PATH)
-include_directories(SYSTEM ${KUDU_CLIENT_INCLUDE_DIR})
+#find_package(kuduClient REQUIRED NO_DEFAULT_PATH)
+#include_directories(SYSTEM ${KUDU_CLIENT_INCLUDE_DIR})
 
 # compile these subdirs using their own CMakeLists.txt
 add_subdirectory(common/function-registry)

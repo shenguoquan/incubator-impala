@@ -43,18 +43,23 @@ else ()
   set(arch_hint "x86")
 endif()
 
-set(HDFS_LIB_PATHS $ENV{HADOOP_LIB_DIR}/native)
+set(HDFS_LIB_PATHS /Users/zhiqian/deploy/hadoop-2.9.2/lib/native)
 
 if (NOT HDFS_FIND_QUIETLY)
   message(STATUS "Architecture: ${arch_hint}")
   message(STATUS "HDFS_LIB_PATHS: ${HDFS_LIB_PATHS}")
 endif()
 
+message(STATUS "HDFS_LIB_PATHS: ${HDFS_LIB_PATHS}")
+
 find_library(HDFS_STATIC_LIB NAMES libhdfs.a PATHS
   ${HDFS_LIB_PATHS}
   # make sure we don't accidentally pick up a different version
   NO_DEFAULT_PATH
   )
+
+message(STATUS "HDFS_STATIC_LIB: ${HDFS_STATIC_LIB}")
+
 find_library(HDFS_SHARED_LIB NAMES libhdfs.so PATHS
   ${HDFS_LIB_PATHS}
   # make sure we don't accidentally pick up a different version

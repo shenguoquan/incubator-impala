@@ -47,9 +47,9 @@ SET(CXX_COMMON_FLAGS "${CXX_COMMON_FLAGS} -Wno-deprecated -Wno-vla")
 SET(CXX_COMMON_FLAGS "${CXX_COMMON_FLAGS} -DBOOST_DATE_TIME_POSIX_TIME_STD_CONFIG")
 SET(CXX_COMMON_FLAGS "${CXX_COMMON_FLAGS} -DBOOST_SYSTEM_NO_DEPRECATED")
 SET(CXX_COMMON_FLAGS "${CXX_COMMON_FLAGS} -B $ENV{IMPALA_TOOLCHAIN}/binutils-$ENV{IMPALA_BINUTILS_VERSION}/bin/")
-IF($ENV{USE_GOLD_LINKER} STREQUAL "true")
-  SET(CXX_COMMON_FLAGS "${CXX_COMMON_FLAGS} -fuse-ld=gold")
-ENDIF()
+#IF($ENV{USE_GOLD_LINKER} STREQUAL "true")
+#  SET(CXX_COMMON_FLAGS "${CXX_COMMON_FLAGS} -fuse-ld=gold")
+#ENDIF()
 
 # On Apple we build with clang and need libstdc++ instead of libc++
 if (APPLE)
@@ -89,7 +89,7 @@ if (CMAKE_CXX_COMPILER_VERSION VERSION_GREATER 7.0)
   #  -faligned-new: new will automatically align types. Otherwise "new Counter()" in the
   #       Kudu util code produces a warning (see KUDU-2094).
   #   TODO: -faligned-new is part of C++17, remove flag when we bump language version.
-  SET(CXX_GCC_FLAGS "${CXX_GCC_FLAGS} -faligned-new")
+  SET(CXX_GCC_FLAGS "${CXX_GCC_FLAGS}")
 endif()
 
 # compiler flags for different build types (run 'cmake -DCMAKE_BUILD_TYPE=<type> .')
@@ -245,12 +245,12 @@ if ("${CMAKE_BUILD_TYPE}" STREQUAL "UBSAN_FULL")
     "-DUNDEFINED_SANITIZER_SUPPRESSIONS=\\\"$ENV{IMPALA_HOME}/bin/ubsan-suppressions.txt\\\"")
 endif()
 
-IF($ENV{ENABLE_IMPALA_IR_DEBUG_INFO} STREQUAL "true")
-  # -g: emit debug symbols in IR. These increase IR size and memory overhead of LLVM, but
-  #     are useful for debugging codegened code and interpreting codegen disassembly
-  #     dumps.
-  SET(CLANG_IR_CXX_FLAGS "${CLANG_IR_CXX_FLAGS}" "-g")
-endif()
+#IF($ENV{ENABLE_IMPALA_IR_DEBUG_INFO} STREQUAL "true")
+#  # -g: emit debug symbols in IR. These increase IR size and memory overhead of LLVM, but
+#  #     are useful for debugging codegened code and interpreting codegen disassembly
+#  #     dumps.
+#  SET(CLANG_IR_CXX_FLAGS "${CLANG_IR_CXX_FLAGS}" "-g")
+#endif()
 
 # Flags to pass to LLVM's opt to further optimize cross-compiled IR.
 #  -inline: inline with low threshold to get rid of trivial accessor functions.
@@ -363,8 +363,8 @@ INCLUDE(CheckIncludeFiles)
 CHECK_INCLUDE_FILES(linux/magic.h HAVE_MAGIC_H)
 
 # Used to check if we're using krb-1.6 or lower.
-CHECK_LIBRARY_EXISTS("krb5" krb5_get_init_creds_opt_set_fast_ccache_name
-  ${KERBEROS_LIBRARY} HAVE_KRB5_GET_INIT_CREDS_OPT_SET_FAST_CCACHE_NAME)
+#CHECK_LIBRARY_EXISTS("krb5" krb5_get_init_creds_opt_set_fast_ccache_name
+#  ${KERBEROS_LIBRARY} HAVE_KRB5_GET_INIT_CREDS_OPT_SET_FAST_CCACHE_NAME)
 
 # This is a list of impala library dependencies. Individual libraries
 # must not specify library dependencies in their own CMakeLists.txt file.
